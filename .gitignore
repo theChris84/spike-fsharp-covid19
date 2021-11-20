@@ -15,4 +15,8 @@ bin
 !.paket/paket.bootstrapper.exe
 .ionide/
 
-!csse_covid_19_data/**
+### vs code  ###
+.vs/
+
+### data ###
+csse_covid_19_data/
