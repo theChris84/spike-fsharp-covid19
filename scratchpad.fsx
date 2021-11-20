@@ -23,9 +23,13 @@ type Covid = CsvProvider<
 
 open System.IO
 
+let only2021Csv (fn: string) = 
+    Path.GetFileName(fn).Contains("2021") 
+    && Path.GetExtension(fn) = ".csv" 
+
 let files = 
     Directory.GetFiles("./csse_covid_19_data/csse_covid_19_daily_reports")
-    |> Seq.filter(fun f -> Path.GetFileName(f).Contains("2021")  && Path.GetExtension(f) = ".csv" )
+    |> Seq.filter(only2021Csv)
     |> Seq.map Path.GetFullPath
 
 // let allData = 
@@ -53,7 +57,7 @@ open XPlot.Plotly
 let top10 = 
     confirmedByCountryDaily
     |> Seq.sortByDescending(fun (country, dates) -> 
-        let lastDate, confirmed = dates |> Seq.last 
+        let _, confirmed = dates |> Seq.last 
         confirmed)
 
 let _, data = confirmedByCountryDaily |> Seq.head
