@@ -15,4 +15,4 @@ bin
 !.paket/paket.bootstrapper.exe
 .ionide/
 
-!/csse_covid_19_data/**/*.csv
+!csse_covid_19_data/**
