@@ -21,3 +21,4 @@ bin
 ### data ###
 csse_covid_19_data/
 .fake
+paket-files/paket.restore.cached
