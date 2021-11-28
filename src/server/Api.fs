@@ -1,22 +1,21 @@
-#load ".paket/load/net5.0/main.group.fsx"
+module Api
 
 open FSharp.Data
 open System
 open System.IO
 
-fsi.AddPrinter<DateTime>(fun d -> d.ToShortDateString())
-
 [<Literal>]
-let CovidSampleFile = __SOURCE_DIRECTORY__ + @"/csse_covid_19_data/csse_covid_19_daily_reports/03-07-2021.csv"
+let CovidSampleFile = @"./../../csse_covid_19_data/csse_covid_19_daily_reports/03-07-2021.csv"
 
 type DailyCovid = CsvProvider<CovidSampleFile, HasHeaders=true, PreferOptionals=true>
 
 let files = 
-    Directory.GetFiles("./csse_covid_19_data/csse_covid_19_daily_reports", "*.csv")
+    Directory.GetFiles("./../../csse_covid_19_data/csse_covid_19_daily_reports", "*.csv")
     |> Seq.filter (fun f -> 
         let fn = Path.GetFileNameWithoutExtension f
         System.DateTime.ParseExact(fn, "MM-dd-yyyy", null) >= (DateTime(2021,1,1)) )
     |> Seq.map Path.GetFullPath
+    |> Array.ofSeq
 
 // list comprehension f#
 // let allData = seq { 
@@ -37,6 +36,7 @@ let allData =
         | Some ps -> ps
         | None -> "" )
     |> Seq.sortBy (fun row -> row.Last_Update.Date)
+    |> Array.ofSeq
 
 
 let clearCountryNames (country: string) =
@@ -55,29 +55,14 @@ let clearCountryNames (country: string) =
     | "Germany" -> "Deutschland"
     | country -> country
 
-let confirmedByCountryDaily = seq {
-    for country, rows in allData |> Seq.groupBy (fun row -> clearCountryNames row.Country_Region ) do
-    let countryByData = seq {
+let confirmedByCountryDaily = [|
+    for country, rows in allData |> Seq.groupBy (fun row -> clearCountryNames row.Country_Region) do
+    let countryByData = [|
         for date, rows in rows |> Seq.groupBy (fun r -> r.Last_Update.Date) do
-            date, rows |> Seq.sumBy (fun r -> r.Confirmed)
-    }
+            {| Date = date; Confirmed_Cases = rows |> Seq.sumBy (fun r -> r.Confirmed) |}
+    |]
     country, countryByData 
-} 
+|]
 
-let top10 = 
-    confirmedByCountryDaily
-    |> Seq.sortByDescending (fun (_, rows) ->  rows |> Seq.map snd  |> Seq.max )
-    |> Seq.take 10
-
-open XPlot.Plotly
-
-let makeScatter(country, values) =
-    let dates, numbers = values |> Seq.toArray |> Array.unzip
-    let trace = Scatter(x = dates, y = numbers ) :> Trace
-    trace.name <- country
-    trace
-
-top10
-|> Seq.map makeScatter
-|> Chart.Plot
-|> Chart.Show
+let countryLookup = confirmedByCountryDaily |> Map
+let allCountries = confirmedByCountryDaily |> Array.map fst
