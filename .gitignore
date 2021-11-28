@@ -19,10 +19,11 @@ bin
 .vs/
 
 ### paket 
-paket-files/
+paket-files/**/*
 
 ### data ###
 csse_covid_19_data/
 .fake
+
 
 
