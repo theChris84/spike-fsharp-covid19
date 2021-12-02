@@ -59,10 +59,20 @@ let confirmedByCountryDaily = [|
     for country, rows in allData |> Seq.groupBy (fun row -> clearCountryNames row.Country_Region) do
     let countryByData = [|
         for date, rows in rows |> Seq.groupBy (fun r -> r.Last_Update.Date) do
-            {| Date = date; Confirmed_Cases = rows |> Seq.sumBy (fun r -> r.Confirmed) |}
+            {| Date = date
+               Confirmed = rows |> Seq.sumBy (fun r -> r.Confirmed)
+               Deaths = rows |> Seq.sumBy (fun r -> r.Deaths)
+               Recovered = rows |> Seq.sumBy (fun r -> match r.Recovered with | Some recoverd -> recoverd | None -> 0 ) |}
     |]
     country, countryByData 
 |]
 
 let countryLookup = confirmedByCountryDaily |> Map
 let allCountries = confirmedByCountryDaily |> Array.map fst
+let countryStats = [|
+    for country, stats in confirmedByCountryDaily do 
+        let mostRecent = stats |> Array.tryLast
+        match mostRecent with
+        | Some mostRecent -> {| mostRecent with Country_Region = country |}
+        | None -> ()
+|]
