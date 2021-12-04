@@ -11,24 +11,22 @@ RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /
 USER appuser
 
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
-WORKDIR /src
-COPY ["src/server/", "src/server/"]
+WORKDIR /build
 COPY [".paket/", ".paket/"]
 COPY [".config/", ".config/"]
-COPY ["csse_covid_19_data/csse_covid_19_daily_reports/", "csse_covid_19_data/csse_covid_19_daily_reports/"]
 COPY ["paket.dependencies", "paket.lock", "./"]
-
+COPY ["src/server/", "src/server/"]
 RUN dotnet tool restore
-WORKDIR /src/src/server
-# RUN dotnet restore "server.fsproj"
-# RUN dotnet build "server.fsproj" -c Release -o /app/build
+RUN dotnet restore "src/server/server.fsproj"
 
-# FROM build AS publish
+WORKDIR /build/src/server
+RUN dotnet build "server.fsproj" -c Release -o /app/build
+
+FROM build AS publish
 # RUN dotnet publish -c Release -r alpine-x64 "server.fsproj" --self-contained true /p:PublishTrimmed=true /p:PublishSingleFile=true -o /app/publish
 RUN dotnet publish -c Release -r alpine-x64 "server.fsproj" --self-contained true /p:PublishTrimmed=true -o /app/publish
 
 FROM base AS final
-WORKDIR /app/publish
-COPY ["csse_covid_19_data/csse_covid_19_daily_reports/", "/csse_covid_19_data/csse_covid_19_daily_reports/"]
-COPY --from=build /app/publish .
+WORKDIR /app/publish/
+COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "server.dll"]

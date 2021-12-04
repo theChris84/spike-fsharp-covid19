@@ -1,0 +1,8 @@
+FIPS,Admin2,Province_State,Country_Region,Last_Update,Lat,Long_,Confirmed,Deaths,Recovered,Active,Combined_Key,Incident_Rate,Case_Fatality_Ratio
+1001,Afghanistan,Afghanistan,Afghanistan,2021-03-08 05:24:48,33.93911,67.709953,55847,2449,49378,4020,Afghanistan,143.46103267025944,4.385195265636471
+,Afghanistan,,Albania,2021-03-08 05:24:48,41.1533,20.1683,112897,1939,75190,35768,Albania,3923.031482382376,1.7174947075653029
+,,,Andorra,2021-03-08 05:24:48,42.5063,1.5218,11042,112,10626,304,Andorra,14291.07616644017,1.0143090019923926
+,,Australian Capital Territory,Australia,2021-03-08 05:24:48,-35.4735,149.0124,122,3,115,4,"Australian Capital Territory, Australia",28.49801448259752,2.459016393442623
+,,Unknown,China,2021-03-08 05:24:48,,,0,0,3,-3,"Unknown, China",,
+,,,Diamond Princess,2021-03-08 05:24:48,,,712,13,699,0,Diamond Princess,,1.8258426966292134
+1001,Autauga,Alabama,US,2021-03-08 05:24:48,32.53952745,-86.64408227,6347,92,,,"Autauga, Alabama, US",11360.504036227605,1.4495037025366315

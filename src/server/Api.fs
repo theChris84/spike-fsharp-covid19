@@ -5,12 +5,12 @@ open System
 open System.IO
 
 [<Literal>]
-let CovidSampleFile = @"./../../csse_covid_19_data/csse_covid_19_daily_reports/03-07-2021.csv"
+let CovidSampleFile = @"./DailyReportSample.csv"
 
 type DailyCovid = CsvProvider<CovidSampleFile, HasHeaders=true, PreferOptionals=true>
 
 let files = 
-    Directory.GetFiles("./../../csse_covid_19_data/csse_covid_19_daily_reports", "*.csv")
+    Directory.GetFiles("./../../data/csse_covid_19_daily_reports", "*.csv")
     |> Seq.filter (fun f -> 
         let fn = Path.GetFileNameWithoutExtension f
         System.DateTime.ParseExact(fn, "MM-dd-yyyy", null) >= (DateTime(2021,1,1)) )
