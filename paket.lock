@@ -56,3 +56,5 @@ NUGET
     XPlot.Plotly (4.0.6)
       FSharp.Core (>= 4.7.2)
       Newtonsoft.Json (>= 12.0.3)
+    Zanaptak.TypedCssClasses (1.0)
+      FSharp.Core (>= 4.3.4)

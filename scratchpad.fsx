@@ -7,16 +7,17 @@ open System.IO
 fsi.AddPrinter<DateTime>(fun d -> d.ToShortDateString())
 
 [<Literal>]
-let CovidSampleFile = __SOURCE_DIRECTORY__ + @"/csse_covid_19_data/csse_covid_19_daily_reports/03-07-2021.csv"
+let CovidSampleFile = __SOURCE_DIRECTORY__ + @"/src/server/DailyReportSample.csv"
 
 type DailyCovid = CsvProvider<CovidSampleFile, HasHeaders=true, PreferOptionals=true>
 
 let files = 
-    Directory.GetFiles("./csse_covid_19_data/csse_covid_19_daily_reports", "*.csv")
+    Directory.GetFiles("./data/csse_covid_19_daily_reports/", "*.csv")
     |> Seq.filter (fun f -> 
         let fn = Path.GetFileNameWithoutExtension f
         System.DateTime.ParseExact(fn, "MM-dd-yyyy", null) >= (DateTime(2021,1,1)) )
     |> Seq.map Path.GetFullPath
+
 
 // list comprehension f#
 // let allData = seq { 
@@ -59,14 +60,24 @@ let confirmedByCountryDaily = seq {
     for country, rows in allData |> Seq.groupBy (fun row -> clearCountryNames row.Country_Region ) do
     let countryByData = seq {
         for date, rows in rows |> Seq.groupBy (fun r -> r.Last_Update.Date) do
-            date, rows |> Seq.sumBy (fun r -> r.Confirmed)
+            // date, rows |> Seq.sumBy (fun r -> r.Confirmed)
+            {|  Confirmed = rows |> Seq.sumBy (fun r -> r.Confirmed)
+                Death = rows |> Seq.sumBy (fun r -> r.Deaths)
+                // Recovered = rows |> Seq.sumBy (fun r -> match r.Recovered with | Some v -> v | None -> 0 )
+                Recovered = rows |> Seq.choose (fun r -> r.Recovered) |> Seq.sum
+            |}
     }
     country, countryByData 
 } 
 
+[<Literal>]
+let fileOutTxt = __SOURCE_DIRECTORY__ + "./Testoutput.txt"
+let output = confirmedByCountryDaily |> Seq.map (fun (c, data) -> sprintf "%s /t %A" c data)
+File.WriteAllLines (fileOutTxt, output) |> ignore
+
 let top10 = 
     confirmedByCountryDaily
-    |> Seq.sortByDescending (fun (_, rows) ->  rows |> Seq.map snd  |> Seq.max )
+    |> Seq.sortByDescending (fun (_, rows) ->  rows |> Seq.map (fun r -> r.Death )  |> Seq.max )
     |> Seq.take 10
 
 open XPlot.Plotly

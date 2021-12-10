@@ -41,29 +41,24 @@ let allData =
 
 let clearCountryNames (country: string) =
     match country.Trim() with    
-    | "Russia" -> "Russian Federation"
-    | "Iran" -> "Iran (Islamic Republic of)"
-    | "Macau" -> "Macao SAR"
-    | "Hong Kong" -> "Hong Kong SAR"
     | "Viet Nam" -> "Vietnam"
-    | "Palestine" -> "occupied Palestinian territory"
     | "Korea, South" -> "South Korea"
     | "Republic of Korea" -> "South Korea"
     | "Unite States" -> "US"
     | "Mainland China" -> "China"
-    | "UK" -> "United Kingdom"
     | "Germany" -> "Deutschland"
     | country -> country
 
 let confirmedByCountryDaily = [|
     for country, rows in allData |> Seq.groupBy (fun row -> clearCountryNames row.Country_Region) do
-    let countryByData = [|
-        for date, rows in rows |> Seq.groupBy (fun r -> r.Last_Update.Date) do
-            {| Date = date
-               Confirmed = rows |> Seq.sumBy (fun r -> r.Confirmed)
-               Deaths = rows |> Seq.sumBy (fun r -> r.Deaths)
-               Recovered = rows |> Seq.sumBy (fun r -> match r.Recovered with | Some recoverd -> recoverd | None -> 0 ) |}
-    |]
+    let countryByData = 
+        [| for date, rows in rows |> Seq.groupBy (fun r -> r.Last_Update.Date) do
+            {|  Date = date
+                Confirmed = rows |> Seq.sumBy (fun r -> r.Confirmed)
+                Deaths = rows |> Seq.sumBy (fun r -> r.Deaths)
+                Recovered =  rows |> Seq.choose (fun r -> r.Recovered) |> Seq.sum
+            |}
+        |]
     country, countryByData 
 |]
 
