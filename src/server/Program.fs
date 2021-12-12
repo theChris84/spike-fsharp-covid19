@@ -10,6 +10,7 @@ module ApiRoutes =
     let apiRouts = router {
         get     "/countries" (Api.allCountries |> json)
         getf    "/countries/%s" findByCountry
+        get     "/countriesByName" (Api.countryStatsByNameAndDeaths |> json)
     }
 
 module UiRouter = 
@@ -57,7 +58,7 @@ module UiRouter =
                 ]
             ]
             tbody [] [ 
-                for row in Api.countryStats do
+                for row in Api.countryStatsByNameAndDeaths do
                     tr [] [
                         th [] [ a [ _href (sprintf "%s" row.Country_Region) ] [ Text row.Country_Region ] ]
                         th [] [ Text (row.Deaths.ToString "N0") ]
@@ -100,7 +101,7 @@ run myApp
 
 (*
     http://localhost:5000/api/countries
+    http://localhost:5000/api/countriesByName
     http://localhost:5000/api/countries/US
-    http://localhost:5000/api/countries/Deutschland
     http://localhost:5000/api/countries/Unknown
 *)
