@@ -27,7 +27,7 @@ module UiRouter =
     let createPage title subtitle (contents: XmlNode) : XmlNode  =
         html [] [
             head [] [
-                link [ _rel "stylesheet"; _href BulmaCssUrl ]
+                link [ _rel "stylesheet"; _href BulmaCssUrl ] 
             ]
             body [] [
                 // section [ _class (Bulma.hero ++ Bulma.``is-primary``) ] [
